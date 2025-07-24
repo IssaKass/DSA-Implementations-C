@@ -112,28 +112,26 @@ void vec_fill(Vector *vec, int value, int count)
         exit(EXIT_FAILURE);
     }
 
-    if (vec->data != NULL && vec->capacity > 0)
+    if (vec->data != NULL)
     {
         free(vec->data);
-        vec->data = NULL; // Set to NULL after freeing
+        vec->data = NULL;
     }
 
     vec->length = count;
     vec->capacity = count;
 
-    vec->data = (int *)malloc(count * sizeof(int));
-
     if (count > 0)
-    { // Only allocate if count is positive
+    {
         vec->data = (int *)malloc(count * sizeof(int));
         if (!vec->data)
         {
             fprintf(stderr, "vec_fill: Memory allocation failed\n");
-            vec->length = 0; // Reset to safe state on failure
+            vec->length = 0;
             vec->capacity = 0;
             exit(EXIT_FAILURE);
         }
-        // Fill the allocated memory with the specified value
+
         for (int i = 0; i < count; i++)
         {
             vec->data[i] = value;
@@ -141,7 +139,6 @@ void vec_fill(Vector *vec, int value, int count)
     }
     else
     {
-        // If count is 0, ensure data is NULL and capacity is 0 for an empty vector
         vec->data = NULL;
         vec->capacity = 0;
     }
@@ -459,37 +456,30 @@ void vec_debug(const Vector *vec)
 
 void vec_copy(Vector *dest, const Vector *src)
 {
-    // It's important to free existing data in dest if it was previously initialized
     if (dest->data != NULL)
     {
         free(dest->data);
+        dest->data = NULL;
     }
 
     dest->length = src->length;
     dest->capacity = src->capacity;
 
-    dest->data = (int *)malloc(dest->capacity * sizeof(int));
-
     if (dest->capacity > 0)
     {
         dest->data = (int *)malloc(dest->capacity * sizeof(int));
-        // CRITICAL FIX: Check if malloc FAILED (returned NULL).
-        if (dest->data == NULL)
+        if (!dest->data)
         {
             fprintf(stderr, "vec_copy: Memory allocation failed\n");
-            // It's good practice to reset the dest vector to a safe, empty state on failure
             dest->length = 0;
             dest->capacity = 0;
-            exit(EXIT_FAILURE); // Exit or return an error code
+            exit(EXIT_FAILURE);
         }
-        // Copy the actual elements from the source to the newly allocated destination.
-        // Only copy up to src->length, as capacity might be larger than length,
-        // and we only care about the valid elements.
+
         memcpy(dest->data, src->data, src->length * sizeof(int));
     }
     else
     {
-        // If source is empty, destination should also be empty with NULL data
         dest->data = NULL;
     }
 }
