@@ -27,6 +27,7 @@ void vec_add(Vector *vec, int element);
 void vec_clear(Vector *vec);
 void vec_insert(Vector *vec, int index, int element);
 int vec_remove(Vector *vec, int index);
+void vec_remove_if(Vector *vec, Predicate predicate);
 int vec_set(Vector *vec, int index, int element);
 int vec_get(const Vector *vec, int index);
 int vec_size(const Vector *vec);
@@ -40,6 +41,7 @@ int vec_indexof(const Vector *vec, int element);
 int vec_last_indexof(const Vector *vec, int element);
 int vec_find_first(const Vector *vec, Predicate predicate);
 int vec_find_last(const Vector *vec, Predicate predicate);
+int vec_binary_search(const Vector *vec, int element);
 
 //
 // ─── COMPARISON & EQUALITY ──────────────────────────────────────────────
@@ -67,6 +69,8 @@ int vec_min(const Vector *vec);
 int vec_max(const Vector *vec);
 int vec_sum(const Vector *vec);
 double vec_average(const Vector *vec);
+int vec_product(const Vector *vec);
+int vec_count(const Vector *vec, int element);
 
 //
 // ─── BOOLEAN PREDICATE LOGIC ────────────────────────────────────────────
@@ -82,7 +86,9 @@ bool vec_none(const Vector *vec, Predicate predicate);
 
 void vec_foreach(const Vector *vec, Consumer action);
 
-
+//
+// ─── UTILITIES ──────────────────────────────────────────────────────────
+//
 
 void vec_print(const Vector *vec);
 void vec_swap(Vector *vec, int i, int j);
