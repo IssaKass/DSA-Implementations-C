@@ -89,27 +89,29 @@ int main() {
 
 ### ⚙️ Core Operations
 
-| Function                                               | Description                                    |
-| ------------------------------------------------------ | ---------------------------------------------- |
-| `void vec_add(Vector *vec, int element)`               | Appends an element to the end of the vector.   |
-| `void vec_clear(Vector *vec)`                          | Removes all elements without freeing capacity. |
-| `void vec_insert(Vector *vec, int index, int element)` | Inserts an element at a specific index.        |
-| `int vec_remove(Vector *vec, int index)`               | Removes the element at the given index.        |
-| `int vec_set(Vector *vec, int index, int element)`     | Sets a value at a given index.                 |
-| `int vec_get(const Vector *vec, int index)`            | Retrieves the element at the given index.      |
-| `int vec_size(const Vector *vec)`                      | Returns the current number of elements.        |
+| Function                                               | Description                                          |
+| ------------------------------------------------------ | ---------------------------------------------------- |
+| `void vec_add(Vector *vec, int element)`               | Appends an element to the end of the vector.         |
+| `void vec_clear(Vector *vec)`                          | Removes all elements without freeing capacity.       |
+| `void vec_insert(Vector *vec, int index, int element)` | Inserts an element at a specific index.              |
+| `int vec_remove(Vector *vec, int index)`               | Removes the element at the given index.              |
+| `void vec_remove_if(Vector *vec, Predicate predicate)` | Removes all elements that match the given predicate. |
+| `int vec_set(Vector *vec, int index, int element)`     | Sets a value at a given index.                       |
+| `int vec_get(const Vector *vec, int index)`            | Retrieves the element at the given index.            |
+| `int vec_size(const Vector *vec)`                      | Returns the current number of elements.              |
 
 ---
 
 ### 🔍 Search & Indexing
 
-| Function                                                     | Description                                 |
-| ------------------------------------------------------------ | ------------------------------------------- |
-| `bool vec_contains(const Vector *vec, int element)`          | Checks if the element exists in the vector. |
-| `int vec_indexof(const Vector *vec, int element)`            | Returns the index of the first occurrence.  |
-| `int vec_last_indexof(const Vector *vec, int element)`       | Returns the index of the last occurrence.   |
-| `int vec_find_first(const Vector *vec, Predicate predicate)` | Finds first index matching predicate.       |
-| `int vec_find_last(const Vector *vec, Predicate predicate)`  | Finds last index matching predicate.        |
+| Function                                                     | Description                                                                  |
+| ------------------------------------------------------------ | ---------------------------------------------------------------------------- |
+| `bool vec_contains(const Vector *vec, int element)`          | Checks if the element exists in the vector.                                  |
+| `int vec_indexof(const Vector *vec, int element)`            | Returns the index of the first occurrence.                                   |
+| `int vec_last_indexof(const Vector *vec, int element)`       | Returns the index of the last occurrence.                                    |
+| `int vec_find_first(const Vector *vec, Predicate predicate)` | Finds first index matching predicate.                                        |
+| `int vec_find_last(const Vector *vec, Predicate predicate)`  | Finds last index matching predicate.                                         |
+| `int vec_binary_search(const Vector *vec, int element)`      | Performs binary search on a sorted vector; returns index or -1 if not found. |
 
 ---
 
@@ -137,12 +139,14 @@ int main() {
 
 ### 📊 Aggregation & Statistics
 
-| Function                                | Description                          |
-| --------------------------------------- | ------------------------------------ |
-| `int vec_min(const Vector *vec)`        | Returns the minimum value.           |
-| `int vec_max(const Vector *vec)`        | Returns the maximum value.           |
-| `int vec_sum(const Vector *vec)`        | Returns the sum of all elements.     |
-| `double vec_average(const Vector *vec)` | Returns the average of all elements. |
+| Function                                        | Description                                                           |
+| ----------------------------------------------- | --------------------------------------------------------------------- |
+| `int vec_min(const Vector *vec)`                | Returns the minimum value.                                            |
+| `int vec_max(const Vector *vec)`                | Returns the maximum value.                                            |
+| `int vec_sum(const Vector *vec)`                | Returns the sum of all elements.                                      |
+| `double vec_average(const Vector *vec)`         | Returns the average of all elements.                                  |
+| `int vec_product(const Vector *vec)`            | Returns the product of all elements, or 1 if the vector is empty.     |
+| `int vec_count(const Vector *vec, int element)` | Returns the number of times a specific element appears in the vector. |
 
 ---
 

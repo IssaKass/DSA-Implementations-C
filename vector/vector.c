@@ -108,6 +108,19 @@ int vec_remove(Vector *vec, int index)
     return element;
 }
 
+void vec_remove_if(Vector *vec, Predicate predicate)
+{
+    int write = 0;
+
+    for (int read = 0; read < vec->size; read++)
+    {
+        if (!predicate(vec->data[read]))
+            vec->data[write++] = vec->data[read];
+    }
+
+    vec->size = write;
+}
+
 int vec_get(const Vector *vec, int index)
 {
     if (index < 0 || index >= vec->size)
@@ -191,6 +204,30 @@ int vec_find_last(const Vector *vec, Predicate predicate)
     return -1;
 }
 
+int vec_binary_search(const Vector *vec, int element)
+{
+    if (vec->size == 0)
+        return -1;
+
+    int left = 0;
+    int right = vec->size - 1;
+    int mid;
+
+    while (left <= right)
+    {
+        mid = left + (right - left) / 2;
+
+        if (vec->data[mid] == element)
+            return mid;
+        else if (vec->data[mid] < element)
+            left = mid + 1;
+        else
+            right = mid - 1;
+    }
+
+    return -1;
+}
+
 //
 // ─── COMPARISON & EQUALITY ──────────────────────────────────────────────
 //
@@ -245,6 +282,7 @@ Vector vec_subvec(const Vector *vec, int from_index, int to_index)
         fprintf(stderr, "Index is out of range\n");
         exit(EXIT_FAILURE);
     }
+
     if (from_index > to_index)
     {
         fprintf(stderr, "Indices are out of order\n");
@@ -263,7 +301,7 @@ Vector vec_subvec(const Vector *vec, int from_index, int to_index)
 
     for (int i = 0; i < subvec.size; i++)
     {
-        subvec.data[i] = vec->data[to_index + i];
+        subvec.data[i] = vec->data[from_index + i];
     }
 
     return subvec;
@@ -375,11 +413,6 @@ int vec_max(const Vector *vec)
 
 int vec_sum(const Vector *vec)
 {
-    if (vec->size == 0)
-    {
-        return 0;
-    }
-
     int sum = 0;
 
     for (int i = 0; i < vec->size; i++)
@@ -392,12 +425,32 @@ int vec_sum(const Vector *vec)
 
 double vec_average(const Vector *vec)
 {
-    if (vec->size == 0)
+    return (double)vec_sum(vec) / vec->size;
+}
+
+int vec_product(const Vector *vec)
+{
+    int product = 1;
+
+    for (int i = 0; i < vec->size; i++)
     {
-        return 0;
+        product *= vec->data[i];
     }
 
-    return (double)vec_sum(vec) / vec->size;
+    return product;
+}
+
+int vec_count(const Vector *vec, int element)
+{
+    int count = 0;
+
+    for (int i = 0; i < vec->size; i++)
+    {
+        if (vec->data[i] == element)
+            count++;
+    }
+
+    return count;
 }
 
 //
