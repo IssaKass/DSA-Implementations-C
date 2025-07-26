@@ -1,4 +1,4 @@
-# DSA C Toolkit
+# DSA Implementations in C language
 
 This repository contains multiple data structures implemented in C:
 
