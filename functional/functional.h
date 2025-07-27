@@ -1,8 +1,13 @@
 #ifndef FUNCTIONAL_H
 #define FUNCTIONAL_H
 
+// Predicate: Takes an int, returns true/false
 typedef bool (*Predicate)(int);
+
+// Function: Takes an int, returns an int (for map, etc.)
 typedef int (*Function)(int);
+
+// Consumer: Takes an int, returns nothing (for foreach)
 typedef void (*Consumer)(int);
 
 // Common predicates
