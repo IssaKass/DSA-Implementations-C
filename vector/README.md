@@ -37,7 +37,7 @@ your-project/
 Compile with:
 
 ```bash
-gcc -o main main.c vector/vector.c
+gcc -o main main.c vector/vector.c functional/functional.c
 ```
 
 Or use with Makefile:
