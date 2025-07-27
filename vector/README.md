@@ -77,101 +77,112 @@ int main() {
 
 ## 📚 Function Reference
 
-### 📦 Creation & Destruction
+### 🧱 Core Management
 
-| Function                                                | Description                                    |
-| ------------------------------------------------------- | ---------------------------------------------- |
-| `Vector vec_create()`                                   | Creates an empty vector with default capacity. |
-| `Vector vec_create_with_capacity(int initial_capacity)` | Creates an empty vector with given capacity.   |
-| `void vec_destroy(Vector *vec)`                         | Frees the memory used by the vector.           |
-
----
-
-### ⚙️ Core Operations
-
-| Function                                               | Description                                          |
-| ------------------------------------------------------ | ---------------------------------------------------- |
-| `void vec_add(Vector *vec, int element)`               | Appends an element to the end of the vector.         |
-| `void vec_clear(Vector *vec)`                          | Removes all elements without freeing capacity.       |
-| `void vec_insert(Vector *vec, int index, int element)` | Inserts an element at a specific index.              |
-| `int vec_remove(Vector *vec, int index)`               | Removes the element at the given index.              |
-| `void vec_remove_if(Vector *vec, Predicate predicate)` | Removes all elements that match the given predicate. |
-| `int vec_set(Vector *vec, int index, int element)`     | Sets a value at a given index.                       |
-| `int vec_get(const Vector *vec, int index)`            | Retrieves the element at the given index.            |
-| `int vec_size(const Vector *vec)`                      | Returns the current number of elements.              |
+| Function                                                  | Description                                             |
+| --------------------------------------------------------- | ------------------------------------------------------- |
+| `Vector vec_create()`                                     | Creates a new vector with default capacity.             |
+| `Vector vec_create_with_capacity(int initial_capacity)`   | Creates a vector with the specified initial capacity.   |
+| `void vec_trim_to_size(Vector *vec)`                      | Reduces capacity to current size.                       |
+| `void vec_ensure_capacity(Vector *vec, int min_capacity)` | Ensures the vector has at least the specified capacity. |
+| `void vec_clear(Vector *vec)`                             | Clears all elements without deallocating memory.        |
+| `void vec_destroy(Vector *vec)`                           | Frees the memory used by the vector.                    |
+| `int vec_size(const Vector *vec)`                         | Returns the number of elements.                         |
+| `int vec_capacity(const Vector *vec)`                     | Returns the current capacity.                           |
+| `bool vec_is_empty(const Vector *vec)`                    | Returns true if the vector has no elements.             |
 
 ---
 
-### 🔍 Search & Indexing
+### ✍️ Element Modification
 
-| Function                                                     | Description                                                                  |
-| ------------------------------------------------------------ | ---------------------------------------------------------------------------- |
-| `bool vec_contains(const Vector *vec, int element)`          | Checks if the element exists in the vector.                                  |
-| `int vec_indexof(const Vector *vec, int element)`            | Returns the index of the first occurrence.                                   |
-| `int vec_last_indexof(const Vector *vec, int element)`       | Returns the index of the last occurrence.                                    |
-| `int vec_find_first(const Vector *vec, Predicate predicate)` | Finds first index matching predicate.                                        |
-| `int vec_find_last(const Vector *vec, Predicate predicate)`  | Finds last index matching predicate.                                         |
-| `int vec_binary_search(const Vector *vec, int element)`      | Performs binary search on a sorted vector; returns index or -1 if not found. |
-
----
-
-### 🧪 Comparison & Equality
-
-| Function                                                  | Description                               |
-| --------------------------------------------------------- | ----------------------------------------- |
-| `bool vec_equals(const Vector *vec1, const Vector *vec2)` | Checks if two vectors have same elements. |
+| Function                                               | Description                                                    |
+| ------------------------------------------------------ | -------------------------------------------------------------- |
+| `void vec_add(Vector *vec, int element)`               | Adds an element to the end.                                    |
+| `void vec_add_all(Vector *vec, Vector *other)`         | Adds all elements from another vector.                         |
+| `void vec_insert(Vector *vec, int index, int element)` | Inserts an element at a specific index.                        |
+| `int vec_remove(Vector *vec, int index)`               | Removes the element at the given index and returns it.         |
+| `void vec_remove_if(Vector *vec, Predicate predicate)` | Removes elements matching a condition.                         |
+| `int vec_set(Vector *vec, int index, int element)`     | Sets a new value at the given index and returns the old value. |
+| `void vec_add_first(Vector *vec, int element)`         | Inserts element at the beginning.                              |
+| `void vec_add_last(Vector *vec, int element)`          | Inserts element at the end.                                    |
+| `int vec_remove_first(Vector *vec)`                    | Removes and returns the first element.                         |
+| `int vec_remove_last(Vector *vec)`                     | Removes and returns the last element.                          |
 
 ---
 
-### 🔁 Transformation
+### 🔍 Element Access & Search
 
-| Function                                                             | Description                                  |
-| -------------------------------------------------------------------- | -------------------------------------------- |
-| `Vector vec_map(const Vector *vec, Function mapper)`                 | Returns a new vector with mapped values.     |
-| `Vector vec_filter(const Vector *vec, Predicate predicate)`          | Returns a new vector with filtered elements. |
-| `Vector vec_subvec(const Vector *vec, int from_index, int to_index)` | Extracts a subvector from `[from, to)`.      |
-| `Vector vec_limit(const Vector *vec, int max_size)`                  | Returns the first `n` elements.              |
-| `Vector vec_skip(const Vector *vec, int n)`                          | Skips the first `n` elements.                |
-| `Vector vec_concat(const Vector *v1, const Vector *v2)`              | Returns a new vector combining two vectors.  |
-| `void vec_reverse(Vector *vec)`                                      | Reverses the vector in-place.                |
+| Function                                                                         | Description                                             |
+| -------------------------------------------------------------------------------- | ------------------------------------------------------- |
+| `int vec_get(const Vector *vec, int index)`                                      | Gets the value at the specified index.                  |
+| `int vec_get_first(const Vector *vec)`                                           | Gets the first element.                                 |
+| `int vec_get_last(const Vector *vec)`                                            | Gets the last element.                                  |
+| `bool vec_contains(const Vector *vec, int element)`                              | Checks if vector contains the element.                  |
+| `bool vec_contains_all(const Vector *vec, const Vector *other)`                  | Returns true if all elements of `other` exist in `vec`. |
+| `int vec_indexof(const Vector *vec, int element)`                                | Index of the first occurrence.                          |
+| `int vec_indexof_range(const Vector *vec, int element, int start, int end)`      | Index of the element in a sub-range.                    |
+| `int vec_last_indexof(const Vector *vec, int element)`                           | Last index of the element.                              |
+| `int vec_last_indexof_range(const Vector *vec, int element, int start, int end)` | Last index in a specific range.                         |
+| `int vec_binary_search(const Vector *vec, int element)`                          | Binary search for sorted vector.                        |
+
+---
+
+### 🔁 Transformation & Derivation
+
+| Function                                                             | Description                                                  |
+| -------------------------------------------------------------------- | ------------------------------------------------------------ |
+| `Vector vec_map(const Vector *vec, Function mapper)`                 | Creates a new vector by applying a function to each element. |
+| `void vec_replace_all(Vector *vec, Function mapper)`                 | Applies function in-place to all elements.                   |
+| `Vector vec_filter(const Vector *vec, Predicate predicate)`          | Filters elements and returns a new vector.                   |
+| `Vector vec_subvec(const Vector *vec, int from_index, int to_index)` | Returns a subvector from range.                              |
+| `Vector vec_limit(const Vector *vec, int max_size)`                  | Returns the first `n` elements.                              |
+| `Vector vec_skip(const Vector *vec, int n)`                          | Returns a vector skipping the first `n` elements.            |
+| `Vector vec_concat(const Vector *v1, const Vector *v2)`              | Concatenates two vectors.                                    |
+| `void vec_reverse(Vector *vec)`                                      | Reverses the vector in-place.                                |
+| `int *vec_to_array(const Vector *vec)`                               | Returns a heap-allocated array copy.                         |
 
 ---
 
 ### 📊 Aggregation & Statistics
 
-| Function                                        | Description                                                           |
-| ----------------------------------------------- | --------------------------------------------------------------------- |
-| `int vec_min(const Vector *vec)`                | Returns the minimum value.                                            |
-| `int vec_max(const Vector *vec)`                | Returns the maximum value.                                            |
-| `int vec_sum(const Vector *vec)`                | Returns the sum of all elements.                                      |
-| `double vec_average(const Vector *vec)`         | Returns the average of all elements.                                  |
-| `int vec_product(const Vector *vec)`            | Returns the product of all elements, or 1 if the vector is empty.     |
-| `int vec_count(const Vector *vec, int element)` | Returns the number of times a specific element appears in the vector. |
+| Function                                        | Description                      |
+| ----------------------------------------------- | -------------------------------- |
+| `int vec_min(const Vector *vec)`                | Minimum value.                   |
+| `int vec_max(const Vector *vec)`                | Maximum value.                   |
+| `int vec_sum(const Vector *vec)`                | Sum of all elements.             |
+| `double vec_average(const Vector *vec)`         | Average of elements.             |
+| `int vec_product(const Vector *vec)`            | Product of all elements.         |
+| `int vec_count(const Vector *vec, int element)` | Count occurrences of an element. |
 
 ---
 
-### 🧠 Boolean Predicate Logic
+### ✅ Predicate-Based Logic
 
-| Function                                                | Description                                    |
-| ------------------------------------------------------- | ---------------------------------------------- |
-| `bool vec_all(const Vector *vec, Predicate predicate)`  | Returns true if all elements match predicate.  |
-| `bool vec_any(const Vector *vec, Predicate predicate)`  | Returns true if any element matches predicate. |
-| `bool vec_none(const Vector *vec, Predicate predicate)` | Returns true if no element matches predicate.  |
-
----
-
-### 🧬 Higher-Order Functions
-
-| Function                                               | Description                         |
-| ------------------------------------------------------ | ----------------------------------- |
-| `void vec_foreach(const Vector *vec, Consumer action)` | Applies a function to each element. |
+| Function                                                     | Description                           |
+| ------------------------------------------------------------ | ------------------------------------- |
+| `bool vec_all(const Vector *vec, Predicate predicate)`       | Returns true if all match predicate.  |
+| `bool vec_any(const Vector *vec, Predicate predicate)`       | Returns true if any match predicate.  |
+| `bool vec_none(const Vector *vec, Predicate predicate)`      | Returns true if none match predicate. |
+| `int vec_find_first(const Vector *vec, Predicate predicate)` | Finds index of first match.           |
+| `int vec_find_last(const Vector *vec, Predicate predicate)`  | Finds index of last match.            |
 
 ---
 
-### 🛠 Utilities
+### 🎯 Higher-Order Utilities
 
-| Function                                   | Description                        |
-| ------------------------------------------ | ---------------------------------- |
-| `void vec_print(const Vector *vec)`        | Prints all elements in the vector. |
-| `void vec_swap(Vector *vec, int i, int j)` | Swaps two elements.                |
-| `bool vec_is_empty(const Vector *vec)`     | Checks if vector has no elements.  |
+| Function                                               | Description                                  |
+| ------------------------------------------------------ | -------------------------------------------- |
+| `void vec_foreach(const Vector *vec, Consumer action)` | Applies a consumer function to each element. |
+
+---
+
+### 🛠️ Utility & Debugging
+
+| Function                                                  | Description                                           |
+| --------------------------------------------------------- | ----------------------------------------------------- |
+| `char *vec_to_string(const Vector *vec)`                  | Returns string representation (heap-allocated).       |
+| `void vec_printf(const Vector *vec)`                      | Prints the vector to stdout.                          |
+| `void vec_swap(Vector *vec, int i, int j)`                | Swaps two elements.                                   |
+| `bool vec_equals(const Vector *vec1, const Vector *vec2)` | Checks if vectors are equal (same order and content). |
+
+---

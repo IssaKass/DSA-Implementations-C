@@ -4,13 +4,8 @@
 #include <stdbool.h>
 #include <string.h>
 
-#ifndef DEFAULT_CAPACITY
-#define DEFAULT_CAPACITY 10
-#endif
-
-static void vec_grow(Vector *vec)
+static void vec_grow(Vector *vec, int new_capacity)
 {
-    vec->capacity *= 2;
     int *new_data = (int *)realloc(vec->data, vec->capacity * sizeof(int));
     if (!new_data)
     {
@@ -18,11 +13,12 @@ static void vec_grow(Vector *vec)
         exit(EXIT_FAILURE);
     }
     vec->data = new_data;
+    vec->capacity = new_capacity;
 }
 
-//
-// ─── CREATION & DESTRUCTION ─────────────────────────────────────────────
-//
+// -----------------------------------------------------------------------------
+// CORE MANAGEMENT (Creation, Destruction, Properties, Internal Resize)
+// -----------------------------------------------------------------------------
 
 Vector vec_create()
 {
@@ -43,6 +39,46 @@ Vector vec_create_with_capacity(int initial_capacity)
     return vec;
 }
 
+void vec_trim_to_size(Vector *vec)
+{
+    if (!vec || vec->capacity == vec->size)
+        return;
+
+    int *new_data = (int *)realloc(vec->data, vec->size * sizeof(int));
+
+    if (new_data)
+    {
+        vec->data = new_data;
+        vec->capacity = vec->size;
+    }
+}
+
+void vec_ensure_capacity(Vector *vec, int min_capacity)
+{
+    if (vec->capacity >= min_capacity)
+        return;
+
+    int new_capacity = vec->capacity > 0 ? vec->capacity : DEFAULT_CAPACITY;
+
+    while (new_capacity < min_capacity)
+    {
+        new_capacity *= GROW_FACTOR;
+    }
+
+    int *new_data = (int *)realloc(vec->data, new_capacity * sizeof(int));
+
+    if (new_data)
+    {
+        vec->data = new_data;
+        vec->capacity = new_capacity;
+    }
+}
+
+void vec_clear(Vector *vec)
+{
+    vec->size = 0;
+}
+
 void vec_destroy(Vector *vec)
 {
     free(vec->data);
@@ -50,21 +86,47 @@ void vec_destroy(Vector *vec)
     vec->data = NULL;
 }
 
-//
-// ─── CORE OPERATIONS ────────────────────────────────────────────────────
-//
+int vec_size(const Vector *vec)
+{
+    return vec->size;
+}
+
+int vec_capacity(const Vector *vec)
+{
+    return vec->capacity;
+}
+
+bool vec_is_empty(const Vector *vec)
+{
+    return vec->size == 0;
+}
+
+// -----------------------------------------------------------------------------
+// ELEMENT MODIFICATION (Add, Insert, Remove, Set)
+// -----------------------------------------------------------------------------
 
 void vec_add(Vector *vec, int element)
 {
     if (vec->size == vec->capacity)
-        vec_grow(vec);
+        vec_grow(vec, vec->capacity * GROW_FACTOR);
 
     vec->data[vec->size++] = element;
 }
 
-void vec_clear(Vector *vec)
+void vec_add_all(Vector *vec, Vector *other)
 {
-    vec->size = 0;
+    int required = vec->size + other->size;
+    if (required > vec->capacity)
+    {
+        int new_capacity = vec->capacity;
+        while (new_capacity < required)
+        {
+            new_capacity *= GROW_FACTOR;
+        }
+    }
+
+    memcpy(&vec->data[vec->size], other->data, other->size * sizeof(int));
+    vec->size += other->size;
 }
 
 void vec_insert(Vector *vec, int index, int element)
@@ -77,7 +139,7 @@ void vec_insert(Vector *vec, int index, int element)
 
     if (vec->size >= vec->capacity)
     {
-        vec_grow(vec);
+        vec_grow(vec, vec->capacity * GROW_FACTOR);
     }
 
     for (int i = vec->size; i > index; i--)
@@ -121,16 +183,6 @@ void vec_remove_if(Vector *vec, Predicate predicate)
     vec->size = write;
 }
 
-int vec_get(const Vector *vec, int index)
-{
-    if (index < 0 || index >= vec->size)
-    {
-        fprintf(stderr, "Index %d is out of range [0..%d]", index, vec->size);
-        exit(EXIT_FAILURE);
-    }
-    return vec->data[index];
-}
-
 int vec_set(Vector *vec, int index, int element)
 {
     if (index < 0 || index >= vec->size)
@@ -145,14 +197,49 @@ int vec_set(Vector *vec, int index, int element)
     return previous_element;
 }
 
-int vec_size(const Vector *vec)
+void vec_add_first(Vector *vec, int element)
 {
-    return vec->size;
+    vec_insert(vec, 0, element);
 }
 
-//
-// ─── SEARCH & INDEXING ──────────────────────────────────────────────────
-//
+void vec_add_last(Vector *vec, int element)
+{
+    vec_add(vec, element);
+}
+
+int vec_remove_first(Vector *vec)
+{
+    return vec_remove(vec, 0);
+}
+
+int vec_remove_last(Vector *vec)
+{
+    return vec_remove(vec, vec->size - 1);
+}
+
+// -----------------------------------------------------------------------------
+// ELEMENT ACCESS & INFORMATION (Get, Search, Indexing)
+// -----------------------------------------------------------------------------
+
+int vec_get(const Vector *vec, int index)
+{
+    if (index < 0 || index >= vec->size)
+    {
+        fprintf(stderr, "Index %d is out of range [0..%d]", index, vec->size);
+        exit(EXIT_FAILURE);
+    }
+    return vec->data[index];
+}
+
+int vec_get_first(const Vector *vec)
+{
+    return vec->data[0];
+}
+
+int vec_get_last(const Vector *vec)
+{
+    return vec->data[vec->size - 1];
+}
 
 bool vec_contains(const Vector *vec, int element)
 {
@@ -164,43 +251,89 @@ bool vec_contains(const Vector *vec, int element)
     return false;
 }
 
+bool vec_contains_all(const Vector *vec, const Vector *other)
+{
+    if (other->size > vec->size)
+        return false;
+
+    for (int i = 0; i < other->size; i++)
+    {
+        if (!vec_contains(vec, other->data[i]))
+            return false;
+    }
+
+    return true;
+}
+
 int vec_indexof(const Vector *vec, int element)
 {
-    for (int i = 0; i < vec->size; i++)
+    return vec_indexof_range(vec, element, 0, vec->size - 1);
+}
+
+int vec_indexof_range(const Vector *vec, int element, int start, int end)
+{
+    if (vec == NULL)
     {
-        if (vec->data[i] == element)
-            return i;
+        fprintf(stderr, "Error: Vector pointer is NULL.\n");
+        exit(EXIT_FAILURE); // Or return -1 or a specific error code
     }
+
+    if (start < 0 || start >= vec->size || end < 0 || end >= vec->size)
+    {
+        fprintf(stderr, "Error: Index out of bounds. start: %d, end: %d, vec_size: %d\n", start, end, vec->size);
+        exit(EXIT_FAILURE);
+    }
+    if (start > end)
+    {
+        fprintf(stderr, "Error: Invalid range: start (%d) is greater than end (%d).\n", start, end);
+        exit(EXIT_FAILURE);
+    }
+
+    while (start <= end)
+    {
+        if (vec->data[start] == element)
+        {
+            return start;
+        }
+        start++;
+    }
+
     return -1;
 }
 
 int vec_last_indexof(const Vector *vec, int element)
 {
-    for (int i = vec->size - 1; i >= 0; i--)
-    {
-        if (vec->data[i] == element)
-            return i;
-    }
-    return -1;
+    return vec_last_indexof_range(vec, element, 0, vec->size - 1);
 }
 
-int vec_find_first(const Vector *vec, Predicate predicate)
+int vec_last_indexof_range(const Vector *vec, int element, int start, int end)
 {
-    for (int i = 0; i < vec->size; i++)
+    if (vec == NULL)
     {
-        if (predicate(vec->data[i]))
-            return vec->data[i];
+        fprintf(stderr, "Error: Vector pointer is NULL.\n");
+        exit(EXIT_FAILURE); // Or return -1 or a specific error code
     }
-    return -1;
-}
 
-int vec_find_last(const Vector *vec, Predicate predicate)
-{
-    for (int i = vec->size - 1; i >= 0; i--)
+    if (start < 0 || start >= vec->size || end < 0 || end >= vec->size)
     {
-        if (predicate(vec->data[i]))
-            return vec->data[i];
+        fprintf(stderr, "Error: Index out of bounds. start: %d, end: %d, vec_size: %d\n", start, end, vec->size);
+        exit(EXIT_FAILURE);
     }
+    if (start > end)
+    {
+        fprintf(stderr, "Error: Invalid range: start (%d) is greater than end (%d).\n", start, end);
+        exit(EXIT_FAILURE);
+    }
+
+    while (end >= start)
+    {
+        if (vec->data[end] == element)
+        {
+            return end;
+        }
+        end--;
+    }
+
     return -1;
 }
 
@@ -228,27 +361,9 @@ int vec_binary_search(const Vector *vec, int element)
     return -1;
 }
 
-//
-// ─── COMPARISON & EQUALITY ──────────────────────────────────────────────
-//
-
-bool vec_equals(const Vector *v1, const Vector *v2)
-{
-    if (v1->size != v2->size)
-        return false;
-
-    for (int i = 0; i < v1->size; i++)
-    {
-        if (v1->data[i] != v2->data[i])
-            return false;
-    }
-
-    return true;
-}
-
-//
-// ─── TRANSFORMATION ─────────────────────────────────────────────────────
-//
+// -----------------------------------------------------------------------------
+// TRANSFORMATION & DERIVATION (New Vectors or In-Place Structure Change)
+// -----------------------------------------------------------------------------
 
 Vector vec_map(const Vector *vec, Function mapper)
 {
@@ -260,6 +375,14 @@ Vector vec_map(const Vector *vec, Function mapper)
     }
 
     return result;
+}
+
+void vec_replace_all(Vector *vec, Function mapper)
+{
+    for (int i = 0; i < vec->size; i++)
+    {
+        vec->data[i] = mapper(vec->data[i]);
+    }
 }
 
 Vector vec_filter(const Vector *vec, Predicate predicate)
@@ -375,9 +498,23 @@ void vec_reverse(Vector *vec)
     }
 }
 
-//
-// ─── AGGREGATION & STATISTICS ───────────────────────────────────────────
-//
+int *vec_to_array(const Vector *vec)
+{
+    if (vec == NULL || vec->size == 0)
+        return NULL;
+
+    int *array = malloc(vec->size * sizeof(int));
+
+    if (!array)
+        return NULL;
+
+    memcpy(array, vec->data, vec->size * sizeof(int));
+    return array;
+}
+
+// -----------------------------------------------------------------------------
+// AGGREGATION & STATISTICS (Single Value Calculations)
+// -----------------------------------------------------------------------------
 
 int vec_min(const Vector *vec)
 {
@@ -453,9 +590,9 @@ int vec_count(const Vector *vec, int element)
     return count;
 }
 
-//
-// ─── BOOLEAN PREDICATE LOGIC ────────────────────────────────────────────
-//
+// -----------------------------------------------------------------------------
+// PREDICATE-BASED LOGIC (Checks all/any/none elements)
+// -----------------------------------------------------------------------------
 
 bool vec_all(const Vector *vec, Predicate predicate)
 {
@@ -487,9 +624,29 @@ bool vec_none(const Vector *vec, Predicate predicate)
     return true;
 }
 
-//
-// ─── HIGHER ORDER FUNCTIONS ─────────────────────────────────────────────
-//
+int vec_find_first(const Vector *vec, Predicate predicate)
+{
+    for (int i = 0; i < vec->size; i++)
+    {
+        if (predicate(vec->data[i]))
+            return vec->data[i];
+    }
+    return -1;
+}
+
+int vec_find_last(const Vector *vec, Predicate predicate)
+{
+    for (int i = vec->size - 1; i >= 0; i--)
+    {
+        if (predicate(vec->data[i]))
+            return vec->data[i];
+    }
+    return -1;
+}
+
+// -----------------------------------------------------------------------------
+// HIGHER-ORDER UTILITIES (Generic application of functions)
+// -----------------------------------------------------------------------------
 
 void vec_foreach(const Vector *vec, Consumer action)
 {
@@ -499,21 +656,47 @@ void vec_foreach(const Vector *vec, Consumer action)
     }
 }
 
-//
-// ─── UTILITIES ──────────────────────────────────────────────────────────
-//
+// -----------------------------------------------------------------------------
+// UTILITY & DEBUGGING (Miscellaneous Helpers)
+// -----------------------------------------------------------------------------
 
-void vec_print(const Vector *vec)
+char *vec_to_string(const Vector *vec)
 {
-    printf("[");
-    for (int i = 0; i < vec->size; i++)
+    if (vec == NULL || vec->size == 0)
     {
-        if (i != vec->size - 1)
-            printf("%d, ", vec->data[i]);
-        else
-            printf("%d", vec->data[i]);
+        char *empty = malloc(3);
+        if (empty)
+            strcpy(empty, "[]");
+        return empty;
     }
-    printf("]\n");
+
+    int est_len = vec->size * 14 + 3; // generous estimate
+    char *buffer = malloc(est_len);
+    if (!buffer)
+        return NULL;
+
+    int offset = 0;
+    offset += snprintf(buffer + offset, est_len - offset, "[");
+
+    for (int i = 0; i < vec->size; ++i)
+    {
+        offset += snprintf(buffer + offset, est_len - offset, "%d", vec->data[i]);
+        if (i < vec->size - 1)
+            offset += snprintf(buffer + offset, est_len - offset, ", ");
+    }
+
+    snprintf(buffer + offset, est_len - offset, "]");
+    return buffer;
+}
+
+void vec_printf(const Vector *vec)
+{
+    char *str = vec_to_string(vec);
+    if (str)
+    {
+        puts(str);
+        free(str);
+    }
 }
 
 void vec_swap(Vector *vec, int i, int j)
@@ -529,7 +712,16 @@ void vec_swap(Vector *vec, int i, int j)
     vec->data[j] = temp;
 }
 
-bool vec_is_empty(const Vector *vec)
+bool vec_equals(const Vector *v1, const Vector *v2)
 {
-    return vec->size == 0;
+    if (v1->size != v2->size)
+        return false;
+
+    for (int i = 0; i < v1->size; i++)
+    {
+        if (v1->data[i] != v2->data[i])
+            return false;
+    }
+
+    return true;
 }
