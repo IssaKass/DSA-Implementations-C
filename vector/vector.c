@@ -134,7 +134,7 @@ void vec_insert(Vector *vec, int index, int element)
     if (index < 0 || index > vec->size)
     {
         fprintf(stderr, "Index out of bounds in vec_insert (index=%d, size=%d)\n", index, vec->size);
-        exit(EXIT_FAILURE);
+        return;
     }
 
     if (vec->size >= vec->capacity)
@@ -148,6 +148,30 @@ void vec_insert(Vector *vec, int index, int element)
     }
 
     vec->data[index] = element;
+    vec->size++;
+}
+
+void vec_insert_sorted(Vector *vec, int element)
+{
+    if (vec->size >= vec->capacity)
+    {
+        vec_grow(vec, vec->capacity * GROW_FACTOR);
+    }
+
+    if (!vec_is_sorted(vec))
+    {
+        fprintf(stderr, "Vector is not sorted\n");
+        return;
+    }
+
+    int i = vec->size - 1;
+    while (i >= 0 && vec->data[i] > element)
+    {
+        vec->data[i + 1] = vec->data[i];
+        i--;
+    }
+
+    vec->data[i + 1] = element;
     vec->size++;
 }
 
@@ -361,6 +385,18 @@ int vec_binary_search(const Vector *vec, int element)
     return -1;
 }
 
+bool vec_is_sorted(const Vector *vec)
+{
+    for (int i = 0; i < vec->size - 1; i++)
+    {
+        if (vec->data[i] > vec->data[i + 1])
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
 // -----------------------------------------------------------------------------
 // TRANSFORMATION & DERIVATION (New Vectors or In-Place Structure Change)
 // -----------------------------------------------------------------------------
@@ -498,6 +534,102 @@ void vec_reverse(Vector *vec)
     }
 }
 
+Vector vec_shift_left(const Vector *vec, int positions)
+{
+    positions = positions % vec->size;
+
+    if (positions == 0)
+    {
+        return *vec;
+    }
+
+    Vector shifted = vec_create_with_capacity(vec->size);
+
+    for (int i = positions; i < vec->size; i++)
+    {
+        vec_add(&shifted, vec->data[i]);
+    }
+
+    for (int i = 0; i < positions; i++)
+    {
+        vec_add(&shifted, 0);
+    }
+
+    return shifted;
+}
+
+Vector vec_shift_right(const Vector *vec, int positions)
+{
+    positions = positions % vec->size;
+
+    if (positions == 0)
+    {
+        return *vec;
+    }
+
+    Vector shifted = vec_create_with_capacity(vec->size);
+
+    for (int i = 0; i < positions; i++)
+    {
+        vec_add(&shifted, 0);
+    }
+
+    for (int i = 0; i < vec->size - positions; i++)
+    {
+        vec_add(&shifted, vec->data[i]);
+    }
+
+    return shifted;
+}
+
+Vector vec_rotate_left(const Vector *vec, int positions)
+{
+    positions = positions % vec->size;
+
+    if (positions == 0)
+    {
+        return *vec;
+    }
+
+    Vector shifted = vec_create_with_capacity(vec->size);
+
+    for (int i = positions; i < vec->size; i++)
+    {
+        vec_add(&shifted, vec->data[i]);
+    }
+
+    for (int i = 0; i < positions; i++)
+    {
+        vec_add(&shifted, vec->data[i]);
+    }
+
+    return shifted;
+}
+
+Vector vec_rotate_right(const Vector *vec, int positions)
+{
+    positions = positions % vec->size;
+
+    if (positions == 0)
+    {
+        return *vec;
+    }
+
+    Vector shifted = vec_create_with_capacity(vec->size);
+
+    for (int i = 0; i < positions; i++)
+    {
+        vec_add(&shifted, vec->data[vec->size - positions + i]);
+    }
+
+    for (int i = 0; i < vec->size - positions; i++)
+    {
+        vec_add(&shifted, vec->data[i]);
+    }
+
+    return shifted;
+}
+
 int *vec_to_array(const Vector *vec)
 {
     if (vec == NULL || vec->size == 0)
@@ -510,6 +642,30 @@ int *vec_to_array(const Vector *vec)
 
     memcpy(array, vec->data, vec->size * sizeof(int));
     return array;
+}
+
+void vec_rearrange(Vector *vec)
+{
+    int i = 0;             // point to positive numbers
+    int j = vec->size - 1; // point to negative numbers
+
+    while (i < j)
+    {
+        while (vec->data[i] < 0)
+        {
+            i++;
+        }
+
+        while (vec->data[j] >= 0)
+        {
+            j--;
+        }
+
+        if (i < j)
+        {
+            vec_swap(vec, i, j);
+        }
+    }
 }
 
 // -----------------------------------------------------------------------------
