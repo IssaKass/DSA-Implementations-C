@@ -668,6 +668,93 @@ void vec_rearrange(Vector *vec)
     }
 }
 
+Vector vec_merge(const Vector *vec1, const Vector *vec2)
+{
+    if (!vec_is_sorted(vec1) || !vec_is_sorted(vec2))
+    {
+        fprintf(stderr, "The vectors are not sorted\n");
+        exit(EXIT_FAILURE);
+    }
+
+    int size = vec1->size + vec2->size;
+    Vector result = vec_create_with_capacity(size);
+
+    int i = 0;
+    int j = 0;
+
+    while (i < vec1->size && j < vec2->size)
+    {
+        if (vec1->data[i] < vec2->data[j])
+        {
+            vec_add(&result, vec1->data[i++]);
+        }
+        else
+        {
+            vec_add(&result, vec2->data[j++]);
+        }
+    }
+    for (; i < vec1->size; i++)
+    {
+        vec_add(&result, vec1->data[i++]);
+    }
+    for (; j < vec2->size; j++)
+    {
+        vec_add(&result, vec2->data[j++]);
+    }
+
+    return result;
+}
+
+Vector vec_union(const Vector *vec1, const Vector *vec2)
+{
+    Vector result = vec_create();
+
+    for (int i = 0; i < vec1->size; i++)
+    {
+        vec_add(&result, vec1->data[i]);
+    }
+
+    for (int i = 0; i < vec2->size; i++)
+    {
+        if (!vec_contains(&result, vec2->data[i]))
+        {
+            vec_add(&result, vec2->data[i]);
+        }
+    }
+
+    return result;
+}
+
+Vector vec_intersection(const Vector *vec1, const Vector *vec2)
+{
+    Vector result = vec_create();
+
+    for (int i = 0; i < vec1->size; i++)
+    {
+        if (vec_contains(vec2, vec1->data[i]))
+        {
+            vec_add(&result, vec1->data[i]);
+        }
+    }
+
+    return result;
+}
+
+Vector vec_difference(const Vector *vec1, const Vector *vec2)
+{
+    Vector result = vec_create();
+
+    for (int i = 0; i < vec1->size; i++)
+    {
+        if (!vec_contains(vec2, vec1->data[i]))
+        {
+            vec_add(&result, vec1->data[i]);
+        }
+    }
+
+    return result;
+}
+
 // -----------------------------------------------------------------------------
 // AGGREGATION & STATISTICS (Single Value Calculations)
 // -----------------------------------------------------------------------------
