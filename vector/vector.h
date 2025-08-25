@@ -42,6 +42,7 @@ void vec_add(Vector *vec, int element);
 void vec_add_all(Vector *vec, Vector *other);
 
 void vec_insert(Vector *vec, int index, int element);
+void vec_insert_sorted(Vector *vec, int element);
 
 int vec_remove(Vector *vec, int index);
 void vec_remove_if(Vector *vec, Predicate predicate);
@@ -72,6 +73,8 @@ int vec_last_indexof_range(const Vector *vec, int element, int start, int end);
 
 int vec_binary_search(const Vector *vec, int element);
 
+bool vec_is_sorted(const Vector *vec);
+
 // -----------------------------------------------------------------------------
 // TRANSFORMATION & DERIVATION (New Vectors or In-Place Structure Change)
 // -----------------------------------------------------------------------------
@@ -84,7 +87,12 @@ Vector vec_limit(const Vector *vec, int max_size);
 Vector vec_skip(const Vector *vec, int n);
 Vector vec_concat(const Vector *v1, const Vector *v2);
 void vec_reverse(Vector *vec);
+Vector vec_shift_left(const Vector *vec, int positions);
+Vector vec_shift_right(const Vector *vec, int positions);
+Vector vec_rotate_left(const Vector *vec, int positions);
+Vector vec_rotate_right(const Vector *vec, int positions);
 int *vec_to_array(const Vector *vec);
+void vec_rearrange(Vector *vec);
 
 // -----------------------------------------------------------------------------
 // AGGREGATION & STATISTICS (Single Value Calculations)

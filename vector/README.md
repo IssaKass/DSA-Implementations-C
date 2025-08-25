@@ -95,51 +95,59 @@ int main() {
 
 ### ✍️ Element Modification
 
-| Function                                               | Description                                                    |
-| ------------------------------------------------------ | -------------------------------------------------------------- |
-| `void vec_add(Vector *vec, int element)`               | Adds an element to the end.                                    |
-| `void vec_add_all(Vector *vec, Vector *other)`         | Adds all elements from another vector.                         |
-| `void vec_insert(Vector *vec, int index, int element)` | Inserts an element at a specific index.                        |
-| `int vec_remove(Vector *vec, int index)`               | Removes the element at the given index and returns it.         |
-| `void vec_remove_if(Vector *vec, Predicate predicate)` | Removes elements matching a condition.                         |
-| `int vec_set(Vector *vec, int index, int element)`     | Sets a new value at the given index and returns the old value. |
-| `void vec_add_first(Vector *vec, int element)`         | Inserts element at the beginning.                              |
-| `void vec_add_last(Vector *vec, int element)`          | Inserts element at the end.                                    |
-| `int vec_remove_first(Vector *vec)`                    | Removes and returns the first element.                         |
-| `int vec_remove_last(Vector *vec)`                     | Removes and returns the last element.                          |
+| Function                                               | Description                                                        |
+| ------------------------------------------------------ | ------------------------------------------------------------------ |
+| `void vec_add(Vector *vec, int element)`               | Adds an element to the end.                                        |
+| `void vec_add_all(Vector *vec, Vector *other)`         | Adds all elements from another vector.                             |
+| `void vec_insert(Vector *vec, int index, int element)` | Inserts an element at a specific index.                            |
+| `void vec_insert_sorted(Vector *vec, int element)`     | Inserts an element into the vector while maintaining sorted order. |
+| `int vec_remove(Vector *vec, int index)`               | Removes the element at the given index and returns it.             |
+| `void vec_remove_if(Vector *vec, Predicate predicate)` | Removes elements matching a condition.                             |
+| `int vec_set(Vector *vec, int index, int element)`     | Sets a new value at the given index and returns the old value.     |
+| `void vec_add_first(Vector *vec, int element)`         | Inserts element at the beginning.                                  |
+| `void vec_add_last(Vector *vec, int element)`          | Inserts element at the end.                                        |
+| `int vec_remove_first(Vector *vec)`                    | Removes and returns the first element.                             |
+| `int vec_remove_last(Vector *vec)`                     | Removes and returns the last element.                              |
 
 ---
 
 ### 🔍 Element Access & Search
 
-| Function                                                                         | Description                                             |
-| -------------------------------------------------------------------------------- | ------------------------------------------------------- |
-| `int vec_get(const Vector *vec, int index)`                                      | Gets the value at the specified index.                  |
-| `int vec_get_first(const Vector *vec)`                                           | Gets the first element.                                 |
-| `int vec_get_last(const Vector *vec)`                                            | Gets the last element.                                  |
-| `bool vec_contains(const Vector *vec, int element)`                              | Checks if vector contains the element.                  |
-| `bool vec_contains_all(const Vector *vec, const Vector *other)`                  | Returns true if all elements of `other` exist in `vec`. |
-| `int vec_indexof(const Vector *vec, int element)`                                | Index of the first occurrence.                          |
-| `int vec_indexof_range(const Vector *vec, int element, int start, int end)`      | Index of the element in a sub-range.                    |
-| `int vec_last_indexof(const Vector *vec, int element)`                           | Last index of the element.                              |
-| `int vec_last_indexof_range(const Vector *vec, int element, int start, int end)` | Last index in a specific range.                         |
-| `int vec_binary_search(const Vector *vec, int element)`                          | Binary search for sorted vector.                        |
+| Function                                                                         | Description                                                              |
+| -------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| `int vec_get(const Vector *vec, int index)`                                      | Gets the value at the specified index.                                   |
+| `int vec_get_first(const Vector *vec)`                                           | Gets the first element.                                                  |
+| `int vec_get_last(const Vector *vec)`                                            | Gets the last element.                                                   |
+| `bool vec_contains(const Vector *vec, int element)`                              | Checks if vector contains the element.                                   |
+| `bool vec_contains_all(const Vector *vec, const Vector *other)`                  | Returns true if all elements of `other` exist in `vec`.                  |
+| `int vec_indexof(const Vector *vec, int element)`                                | Index of the first occurrence.                                           |
+| `int vec_indexof_range(const Vector *vec, int element, int start, int end)`      | Index of the element in a sub-range.                                     |
+| `int vec_last_indexof(const Vector *vec, int element)`                           | Last index of the element.                                               |
+| `int vec_last_indexof_range(const Vector *vec, int element, int start, int end)` | Last index in a specific range.                                          |
+| `int vec_binary_search(const Vector *vec, int element)`                          | Binary search for sorted vector.                                         |
+| `bool vec_is_sorted(const Vector *vec)`                                          | Checks whether the elements in the vector are sorted in ascending order. |
 
 ---
 
 ### 🔁 Transformation & Derivation
 
-| Function                                                             | Description                                                  |
-| -------------------------------------------------------------------- | ------------------------------------------------------------ |
-| `Vector vec_map(const Vector *vec, Function mapper)`                 | Creates a new vector by applying a function to each element. |
-| `void vec_replace_all(Vector *vec, Function mapper)`                 | Applies function in-place to all elements.                   |
-| `Vector vec_filter(const Vector *vec, Predicate predicate)`          | Filters elements and returns a new vector.                   |
-| `Vector vec_subvec(const Vector *vec, int from_index, int to_index)` | Returns a subvector from range.                              |
-| `Vector vec_limit(const Vector *vec, int max_size)`                  | Returns the first `n` elements.                              |
-| `Vector vec_skip(const Vector *vec, int n)`                          | Returns a vector skipping the first `n` elements.            |
-| `Vector vec_concat(const Vector *v1, const Vector *v2)`              | Concatenates two vectors.                                    |
-| `void vec_reverse(Vector *vec)`                                      | Reverses the vector in-place.                                |
-| `int *vec_to_array(const Vector *vec)`                               | Returns a heap-allocated array copy.                         |
+| Function                                                             | Description                                                                                                      |
+| -------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `Vector vec_map(const Vector *vec, Function mapper)`                 | Creates a new vector by applying a function to each element.                                                     |
+| `void vec_replace_all(Vector *vec, Function mapper)`                 | Applies function in-place to all elements.                                                                       |
+| `Vector vec_filter(const Vector *vec, Predicate predicate)`          | Filters elements and returns a new vector.                                                                       |
+| `Vector vec_subvec(const Vector *vec, int from_index, int to_index)` | Returns a subvector from range.                                                                                  |
+| `Vector vec_limit(const Vector *vec, int max_size)`                  | Returns the first `n` elements.                                                                                  |
+| `Vector vec_skip(const Vector *vec, int n)`                          | Returns a vector skipping the first `n` elements.                                                                |
+| `Vector vec_concat(const Vector *v1, const Vector *v2)`              | Concatenates two vectors.                                                                                        |
+| `void vec_reverse(Vector *vec)`                                      | Reverses the vector in-place.                                                                                    |
+| `Vector vec_shift_left(const Vector *vec, int positions)`            | Returns a new vector with elements shifted left by the given number of positions (vacated spots filled with 0).  |
+| `Vector vec_shift_right(const Vector *vec, int positions)`           | Returns a new vector with elements shifted right by the given number of positions (vacated spots filled with 0). |
+| `Vector vec_rotate_left(const Vector *vec, int positions)`           | Returns a new vector with elements rotated left by the given number of positions.                                |
+| `Vector vec_rotate_right(const Vector *vec, int positions)`          | Returns a new vector with elements rotated right by the given number of positions.                               |
+
+| `int *vec_to_array(const Vector *vec)` | Returns a heap-allocated array copy. |
+| `void vec_rearrange(Vector *vec)` | Rearranges the vector elements (e.g., separating positives/negatives or evens/odds depending on implementation). |
 
 ---
 
