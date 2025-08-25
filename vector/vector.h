@@ -93,6 +93,10 @@ Vector vec_rotate_left(const Vector *vec, int positions);
 Vector vec_rotate_right(const Vector *vec, int positions);
 int *vec_to_array(const Vector *vec);
 void vec_rearrange(Vector *vec);
+Vector vec_merge(const Vector *vec1, const Vector *vec2);
+Vector vec_union(const Vector *vec1, const Vector *vec2);
+Vector vec_intersection(const Vector *vec1, const Vector *vec2);
+Vector vec_difference(const Vector *vec1, const Vector *vec2);
 
 // -----------------------------------------------------------------------------
 // AGGREGATION & STATISTICS (Single Value Calculations)

@@ -145,9 +145,12 @@ int main() {
 | `Vector vec_shift_right(const Vector *vec, int positions)`           | Returns a new vector with elements shifted right by the given number of positions (vacated spots filled with 0). |
 | `Vector vec_rotate_left(const Vector *vec, int positions)`           | Returns a new vector with elements rotated left by the given number of positions.                                |
 | `Vector vec_rotate_right(const Vector *vec, int positions)`          | Returns a new vector with elements rotated right by the given number of positions.                               |
-
-| `int *vec_to_array(const Vector *vec)` | Returns a heap-allocated array copy. |
-| `void vec_rearrange(Vector *vec)` | Rearranges the vector elements (e.g., separating positives/negatives or evens/odds depending on implementation). |
+| `int *vec_to_array(const Vector *vec)`                               | Returns a heap-allocated array copy.                                                                             |
+| `void vec_rearrange(Vector *vec)`                                    | Rearranges the vector elements (e.g., separating positives/negatives or evens/odds depending on implementation). |
+| `Vector vec_merge(const Vector *vec1, const Vector *vec2)`           | Merges two **sorted vectors** into a new sorted vector.                                                          |
+| `Vector vec_union(const Vector *vec1, const Vector *vec2)`           | Returns a vector containing the union of two sets (unique elements from both).                                   |
+| `Vector vec_intersection(const Vector *vec1, const Vector *vec2)`    | Returns a vector containing the intersection of two sets (common elements only).                                 |
+| `Vector vec_difference(const Vector *vec1, const Vector *vec2)`      | Returns a vector containing the difference of two sets (elements in `vec1` that are not in `vec2`).              |
 
 ---
 
